@@ -102,10 +102,9 @@ ERRBOT = ScreenshotContent(
         {
             "sender": "Errbot",
             "message": """This is Errbot version 6.2.0
-                • Visit http://errbot.io/ for more information about errbot in general.
-                • Visit http://errbot.io/en/latest/#user-guide for help with configuration,administration and plugin development.
-                • Errbot is built through the hard work and dedication of everyone who
-                contributes code, documentation and bug reports at https://github.com/errbotio.""",
+• Visit http://errbot.io/ for more information about errbot in general.
+• Visit http://errbot.io/en/latest/#user-guide for help with configuration,administration and plugin development.
+• Errbot is built through the hard work and dedication of everyone who contributes code, documentation and bug reports at https://github.com/errbotio.""",
         },
     ],
 )
@@ -127,7 +126,7 @@ GITHUB_ACTIONS = ScreenshotContent(
 GITHUB_DETAIL = ScreenshotContent(
     topic="Issue and PR details",
     content=[
-        {"sender": f"{BO_NAME}", "message": "@**GitHub Detail Bot** can you show me #1234 ?"},
+        {"sender": f"{BO_NAME}", "message": "@**GitHub Detail Bot** #1234 ?"},
         {
             "sender": "GitHub Detail Bot",
             "message": """**[zulip/zulip#1234]() - Fix login bug affecting multiple users**
@@ -263,9 +262,9 @@ status: **new** => **closed**, resolution: => **fixed**""",
 XKCD = ScreenshotContent(
     topic="xkcd",
     content=[
-        {"sender": f"{BO_NAME}", "message": "@**xkcd** help"},
+        {"sender": f"{BO_NAME}", "message": "@**xkcd Bot** help"},
         {
-            "sender": "xkcd",
+            "sender": "xkcd Bot",
             "message": """xkcd bot supports these commands:
 * `@**xkcd** help` to show this help message.
 * `@**xkcd** latest` to fetch the latest comic strip from xkcd.

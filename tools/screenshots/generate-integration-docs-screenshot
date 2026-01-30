@@ -257,21 +257,23 @@ def capture_last_message_screenshot(bot: UserProfile, image_path: str) -> None:
 
 def send_thread_messages(
     bot: UserProfile,
-    channel: str,
+    channel_name: str,
     topic: str,
     thread_messages_data: list[MessageThread],
     integration: Integration,
 ) -> list[int]:
     realm = bot.realm
-    stream = ensure_stream(realm, channel, acting_user=bot.bot_owner)
+    channel = ensure_stream(realm, channel_name, acting_user=bot.bot_owner)
 
     Message.objects.filter(
         realm=realm,
-        recipient=stream.recipient,
+        recipient=channel.recipient,
         subject__iexact=topic,
     ).delete()
 
     assert bot.bot_owner is not None
+
+    user = create_user(realm=realm, username="Bo Williams", acting_user=bot.bot_owner)
 
     message_requests = []
     for messages in thread_messages_data:
@@ -281,18 +283,17 @@ def send_thread_messages(
         if sender_name in {bot.full_name, integration.display_name, integration.name.title()}:
             sender = bot
         else:
-            user = create_user(realm=realm, username=sender_name, acting_user=bot.bot_owner)
             sender = user
 
         message_request = internal_prep_stream_message(
             sender,
-            stream,
+            channel,
             topic,
             content,
         )
         message_requests.append(message_request)
 
-    bulk_add_subscriptions(realm, [stream], [bot, user], acting_user=bot)
+    bulk_add_subscriptions(realm, [channel], [user], acting_user=bot)
 
     sent_message_results = do_send_messages(message_requests)
     return [result.message_id for result in sent_message_results]
@@ -302,8 +303,8 @@ def capture_thread_screenshot(
     bot: UserProfile, channel_name: str, topic: str, message_ids: list[int], image_path: str
 ) -> None:
     assert bot.bot_owner is not None
-    stream = ensure_stream(bot.realm, channel_name, acting_user=bot.bot_owner)
-    narrow_uri = topic_narrow_url(realm=bot.realm, stream=stream, topic_name=topic)
+    channel = ensure_stream(bot.realm, channel_name, acting_user=bot.bot_owner)
+    narrow_uri = topic_narrow_url(realm=bot.realm, stream=channel, topic_name=topic)
     narrow = f"{channel_name}/{topic}"
     screenshot_script = os.path.join(SCREENSHOTS_DIR, "thread-screenshot.ts")
     subprocess.check_call(
@@ -338,7 +339,7 @@ def generate_screenshot_from_config(
             fixture_path = get_fixture_path(integration, screenshot_config)
             if send_bot_payload_message(bot, integration, fixture_path, screenshot_config):
                 capture_last_message_screenshot(bot, image_path)
-        case (_, FixturelessScreenshotConfig(message=list() as messages)):
+        case (_, FixturelessScreenshotConfig(message=messages)) if isinstance(messages, list):
             message_ids = send_thread_messages(
                 bot, channel_name, screenshot_config.topic, messages, integration
             )
@@ -346,7 +347,7 @@ def generate_screenshot_from_config(
                 capture_thread_screenshot(
                     bot, channel_name, screenshot_config.topic, message_ids, image_path
                 )
-        case (_, FixturelessScreenshotConfig(message=str() as message)):
+        case (_, FixturelessScreenshotConfig(message=message)) if isinstance(message, str):
             send_bot_mock_message(
                 bot,
                 channel=channel_name,

@@ -1075,8 +1075,18 @@ PYTHON_API_INTEGRATIONS: list[PythonAPIIntegration] = [
 ]
 
 BOT_INTEGRATIONS: list[BotIntegration] = [
-    BotIntegration("github_detail", ["version-control", "bots"], display_name="GitHub Detail"),
-    BotIntegration("xkcd", ["bots", "entertainment"], display_name="xkcd"),
+    BotIntegration(
+        "github_detail",
+        ["version-control", "bots"],
+        [FixturelessScreenshotConfigOptions(bot_name="GitHub Detail Bot")],
+        display_name="GitHub Detail",
+    ),
+    BotIntegration(
+        "xkcd",
+        ["bots", "entertainment"],
+        [FixturelessScreenshotConfigOptions(bot_name="xkcd Bot")],
+        display_name="xkcd",
+    ),
 ]
 
 HUBOT_INTEGRATIONS: list[HubotIntegration] = [
